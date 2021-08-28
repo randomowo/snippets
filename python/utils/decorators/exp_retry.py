@@ -9,6 +9,9 @@ from .lib import parametrized_dec
 
 class ExpRetryExitCallback:
     """Вспомогательный класс для декоратора exp_retry для вызова по завершении"""
+
+    __slots__ = ('callback', 'used_on_class_method', 'args_positions', 'kwargs_name_pairs', )
+
     def __init__(
             self,
             func: Union[Callable, str],
@@ -31,9 +34,9 @@ class ExpRetryExitCallback:
             raise Exception('Can not use str type of func outside of class')
 
         self.callback = func
-        self.is_class_method = used_on_class_method
-        self.args_params_positions = args_positions
-        self.kwargs_params_names = kwargs_name_pairs
+        self.used_on_class_method = used_on_class_method
+        self.args_positions = args_positions
+        self.kwargs_name_pairs = kwargs_name_pairs
 
     def __call__(self, *args, **kwargs) -> None:
         """
@@ -41,32 +44,32 @@ class ExpRetryExitCallback:
         :param args: Параметры переданные из функции, на которой был использован декоратор exp_retry
         :param kwargs: Именованные параметры переданные из функции, на которой был использован декоратор exp_retry
         """
-        args_ = args[1:] if self.is_class_method else args
+        args_ = args[1:] if self.used_on_class_method else args
         parsed_args = self._parse_args(*args_)
         parsed_kwargs = self._parse_kwargs(**kwargs)
-        if self.is_class_method and isinstance(self.callback, str):
+        if self.used_on_class_method and isinstance(self.callback, str):
             getattr(args[0], str(self.callback))(*parsed_args, **parsed_kwargs)
 
         elif callable(self.callback):
             self.callback(*parsed_args, **parsed_kwargs)
 
     def _parse_args(self, *args) -> list[Any]:
-        if not self.args_params_positions or len(args) == 0:
+        if not self.args_positions or len(args) == 0:
             return []
 
         result = []
-        for arg_position in self.args_params_positions:
+        for arg_position in self.args_positions:
             result.append(args[arg_position])
 
         return result
 
     def _parse_kwargs(self, **kwargs) -> dict[str, Any]:
-        if not self.kwargs_params_names or len(kwargs) == 0:
+        if not self.kwargs_name_pairs or len(kwargs) == 0:
             return {}
 
         result = {}
-        for kw_name, func_kw_name in self.kwargs_params_names:
-            result[func_kw_name] = kwargs[kw_name]
+        for func_kw_name, callback_kw_name in self.kwargs_name_pairs:
+            result[callback_kw_name] = kwargs[func_kw_name]
 
         return result
 
