@@ -7,6 +7,7 @@ from typing import Callable
 
 from .lib import parametrized_dec
 
+__all__ = ['timeout']
 
 @parametrized_dec
 def timeout(func: Callable, timeout_=10, name=''):

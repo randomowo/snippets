@@ -7,6 +7,11 @@ from typing import Union, Callable, Optional, Tuple, Any, Type
 
 from .lib import parametrized_dec
 
+__all__ = [
+    'exp_retry',
+    'ExpRetryExitCallback'
+]
+
 class ExpRetryExitCallback:
     """Вспомогательный класс для декоратора exp_retry для вызова по завершении"""
 
