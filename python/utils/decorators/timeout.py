@@ -12,6 +12,8 @@ from .lib import parametrized_dec
 def timeout(func: Callable, timeout_=10, name=''):
     """
     Timeout decorator based on multiprocessing lib
+
+    use carefully. can take up the entire CPU time untill done.
     """
 
     @functools.wraps(func)
@@ -20,19 +22,19 @@ def timeout(func: Callable, timeout_=10, name=''):
         def queue_wrapper(queue, *args_, **kwargs_):
             queue.put(func(*args_, **kwargs_))
 
-        t = time.time()
+        start_time = time.time()
 
-        q = multiprocessing.Queue()
-        process = multiprocessing.Process(target=queue_wrapper, args=(q, *args), kwargs=kwargs, name=name)
+        queue = multiprocessing.Queue()
+        process = multiprocessing.Process(target=queue_wrapper, args=(queue, *args), kwargs=kwargs, name=name)
         process.start()
         process.join(timeout=timeout_)
         process.terminate()
 
         if process.exitcode is not None:
-            logging.info(f'Function {func.__name__} excecution took {time.time() - t}s')
+            logging.info('Function %s excecution took %fs', func.__name__, time.time() - start_time)
             return q.get()
         else:
-            logging.warning(f'Function call {func.__name__} timeout exceeded')
+            logging.warning('Function call %s timeout exceeded', func.__name__)
             raise Exception('timeout')
 
     return wrapper
