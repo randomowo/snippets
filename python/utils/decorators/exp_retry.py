@@ -20,7 +20,7 @@ class ExpRetryExitCallback:
             kwargs_name_pairs: Optional[Tuple[Tuple[str, str], ...]] = None
     ):
         """
-        Инициализациия колбкека для декоратора exp_retry
+        Инициализациия колбека для декоратора exp_retry
         :param func: Функция, которая будет вызвана
         :param used_on_class_method: Означает что декораторк exp_retry был использован на методе класса
         :param args_positions: Позиции параметров из функции, на которой был использован декоратор exp_retry, которые
