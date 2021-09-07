@@ -33,7 +33,8 @@ def timeout(func: Callable, timeout_=10, name=''):
 
         if process.exitcode is not None:
             logging.info('Function %s excecution took %fs', func.__name__, time.time() - start_time)
-            return q.get()
+            return queue.get()
+
         else:
             logging.warning('Function call %s timeout exceeded', func.__name__)
             raise Exception('timeout')
